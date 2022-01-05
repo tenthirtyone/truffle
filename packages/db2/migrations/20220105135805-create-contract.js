@@ -8,13 +8,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      projectId: {
-        type: Sequelize.NUMBER,
-        references: {
-          model: "Projects",
-          key: "id"
-        }
-      },
+
       name: {
         type: Sequelize.STRING
       },

@@ -9,17 +9,15 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      ContractInstance.belongsTo(models.Contract, { foreignKey: "contractId" });
-      ContractInstance.belongsTo(models.Network, { foreignKey: "networkId" });
+      ContractInstance.belongsTo(models.Contract);
+      ContractInstance.hasOne(models.Network);
     }
   }
   ContractInstance.init(
     {
       address: DataTypes.STRING,
       txHash: DataTypes.STRING,
-      links: DataTypes.STRING,
-      networkId: DataTypes.NUMBER,
-      contractId: DataTypes.NUMBER
+      links: DataTypes.STRING
     },
     {
       sequelize,

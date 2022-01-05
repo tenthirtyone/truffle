@@ -17,13 +17,6 @@ module.exports = {
       links: {
         type: Sequelize.STRING
       },
-      contractId: {
-        type: Sequelize.NUMBER,
-        references: {
-          model: "Contracts",
-          key: "id"
-        }
-      },
       networkId: {
         type: Sequelize.NUMBER,
         references: {

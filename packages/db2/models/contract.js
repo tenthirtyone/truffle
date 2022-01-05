@@ -9,30 +9,101 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Contract.belongsTo(models.Project, { foreignKey: "projectId" });
+      Contract.belongsTo(models.Project);
       Contract.hasMany(models.ContractInstance);
     }
   }
   Contract.init(
     {
-      projectId: DataTypes.NUMBER,
       name: DataTypes.STRING,
-      abi: DataTypes.STRING,
+      abi: {
+        type: DataTypes.STRING,
+        get() {
+          const rawValue = this.getDataValue("abi");
+          return rawValue ? JSON.parse(rawValue) : null;
+        },
+        set(value) {
+          this.setDataValue("abi", JSON.stringify(value));
+        }
+      },
       metadata: DataTypes.STRING,
-      devDoc: DataTypes.STRING,
-      userDoc: DataTypes.STRING,
+      devDoc: {
+        type: DataTypes.STRING,
+        get() {
+          const rawValue = this.getDataValue("devDoc");
+          return rawValue ? JSON.parse(rawValue) : null;
+        },
+        set(value) {
+          this.setDataValue("devDoc", JSON.stringify(value));
+        }
+      },
+      userDoc: {
+        type: DataTypes.STRING,
+        get() {
+          const rawValue = this.getDataValue("userDoc");
+          return rawValue ? JSON.parse(rawValue) : null;
+        },
+        set(value) {
+          this.setDataValue("userDoc", JSON.stringify(value));
+        }
+      },
       sourcePath: DataTypes.STRING,
       source: DataTypes.STRING,
       sourceMap: DataTypes.STRING,
       deployedSourceMap: DataTypes.STRING,
-      ast: DataTypes.STRING,
-      legacyAst: DataTypes.STRING,
-      bytecode: DataTypes.STRING,
-      deployedBytecode: DataTypes.STRING,
+      ast: {
+        type: DataTypes.STRING,
+        get() {
+          const rawValue = this.getDataValue("ast");
+          return rawValue ? JSON.parse(rawValue) : null;
+        },
+        set(value) {
+          this.setDataValue("ast", JSON.stringify(value));
+        }
+      },
+      legacyAst: {
+        type: DataTypes.STRING,
+        get() {
+          const rawValue = this.getDataValue("legacyAst");
+          return rawValue ? JSON.parse(rawValue) : null;
+        },
+        set(value) {
+          this.setDataValue("legacyAst", JSON.stringify(value));
+        }
+      },
+      bytecode: {
+        type: DataTypes.STRING,
+        get() {
+          const rawValue = this.getDataValue("bytecode");
+          return rawValue ? JSON.parse(rawValue) : null;
+        },
+        set(value) {
+          this.setDataValue("bytecode", JSON.stringify(value));
+        }
+      },
+      deployedBytecode: {
+        type: DataTypes.STRING,
+        get() {
+          const rawValue = this.getDataValue("deployedBytecode");
+          return rawValue ? JSON.parse(rawValue) : null;
+        },
+        set(value) {
+          this.setDataValue("deployedBytecode", JSON.stringify(value));
+        }
+      },
       immutableReferences: DataTypes.STRING,
       generatedSources: DataTypes.STRING,
       deployedGeneratedSources: DataTypes.STRING,
-      compiler: DataTypes.STRING
+      compiler: {
+        type: DataTypes.STRING,
+        get() {
+          const rawValue = this.getDataValue("compiler");
+          return rawValue ? JSON.parse(rawValue) : null;
+        },
+        set(value) {
+          this.setDataValue("compiler", JSON.stringify(value));
+        }
+      }
     },
     {
       sequelize,

@@ -14,7 +14,10 @@ module.exports = (sequelize, DataTypes) => {
   }
   Project.init(
     {
-      name: DataTypes.STRING
+      name: {
+        type: DataTypes.STRING,
+        unique: true
+      }
     },
     {
       sequelize,
