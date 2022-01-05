@@ -8,19 +8,11 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      forkId: {
-        allowNull: true,
-        type: Sequelize.NUMBER,
-        references: {
-          model: "Networks",
-          key: "id"
-        }
+      chainId: {
+        type: Sequelize.NUMBER
       },
       name: {
         type: Sequelize.STRING
-      },
-      forkId: {
-        type: Sequelize.NUMBER
       },
       createdAt: {
         allowNull: false,

@@ -8,21 +8,20 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-
       name: {
         type: Sequelize.STRING
       },
       abi: {
-        type: Sequelize.STRING
+        type: Sequelize.JSON
       },
       metadata: {
         type: Sequelize.STRING
       },
-      devDoc: {
-        type: Sequelize.STRING
+      devdoc: {
+        type: Sequelize.JSON
       },
-      userDoc: {
-        type: Sequelize.STRING
+      userdoc: {
+        type: Sequelize.JSON
       },
       sourcePath: {
         type: Sequelize.STRING
@@ -37,16 +36,16 @@ module.exports = {
         type: Sequelize.STRING
       },
       ast: {
-        type: Sequelize.STRING
+        type: Sequelize.JSON
       },
-      legacyAst: {
-        type: Sequelize.STRING
+      legacyAST: {
+        type: Sequelize.JSON
       },
       bytecode: {
-        type: Sequelize.STRING
+        type: Sequelize.JSON
       },
       deployedBytecode: {
-        type: Sequelize.STRING
+        type: Sequelize.JSON
       },
       immutableReferences: {
         type: Sequelize.STRING
@@ -58,7 +57,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       compiler: {
-        type: Sequelize.STRING
+        type: Sequelize.JSON
       },
       createdAt: {
         allowNull: false,

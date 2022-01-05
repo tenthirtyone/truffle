@@ -9,7 +9,11 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Network.hasOne(models.Network, { foreignKey: "forkId" });
+      Network.hasMany(models.Network, { as: "Forks", foreignKey: "ForkId" });
+      Network.belongsTo(models.Network, {
+        as: "Genesis",
+        foreignKey: "ForkId"
+      });
       Network.belongsToMany(models.ContractInstance, {
         through: "ContractInstanceNetworks"
       });
@@ -17,8 +21,8 @@ module.exports = (sequelize, DataTypes) => {
   }
   Network.init(
     {
-      name: DataTypes.STRING,
-      forkId: DataTypes.NUMBER
+      chainId: DataTypes.NUMBER,
+      name: DataTypes.STRING
     },
     {
       sequelize,

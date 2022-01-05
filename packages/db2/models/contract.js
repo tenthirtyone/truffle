@@ -16,94 +16,32 @@ module.exports = (sequelize, DataTypes) => {
   Contract.init(
     {
       name: DataTypes.STRING,
-      abi: {
-        type: DataTypes.STRING,
+      contractName: {
+        type: DataTypes.VIRTUAL,
         get() {
-          const rawValue = this.getDataValue("abi");
-          return rawValue ? JSON.parse(rawValue) : null;
+          const rawValue = this.getDataValue("name");
+          return rawValue ? rawValue : null;
         },
         set(value) {
-          this.setDataValue("abi", JSON.stringify(value));
+          this.setDataValue("name", value);
         }
       },
+      abi: DataTypes.JSON,
       metadata: DataTypes.STRING,
-      devDoc: {
-        type: DataTypes.STRING,
-        get() {
-          const rawValue = this.getDataValue("devDoc");
-          return rawValue ? JSON.parse(rawValue) : null;
-        },
-        set(value) {
-          this.setDataValue("devDoc", JSON.stringify(value));
-        }
-      },
-      userDoc: {
-        type: DataTypes.STRING,
-        get() {
-          const rawValue = this.getDataValue("userDoc");
-          return rawValue ? JSON.parse(rawValue) : null;
-        },
-        set(value) {
-          this.setDataValue("userDoc", JSON.stringify(value));
-        }
-      },
+      devdoc: DataTypes.JSON,
+      userdoc: DataTypes.JSON,
       sourcePath: DataTypes.STRING,
       source: DataTypes.STRING,
       sourceMap: DataTypes.STRING,
       deployedSourceMap: DataTypes.STRING,
-      ast: {
-        type: DataTypes.STRING,
-        get() {
-          const rawValue = this.getDataValue("ast");
-          return rawValue ? JSON.parse(rawValue) : null;
-        },
-        set(value) {
-          this.setDataValue("ast", JSON.stringify(value));
-        }
-      },
-      legacyAst: {
-        type: DataTypes.STRING,
-        get() {
-          const rawValue = this.getDataValue("legacyAst");
-          return rawValue ? JSON.parse(rawValue) : null;
-        },
-        set(value) {
-          this.setDataValue("legacyAst", JSON.stringify(value));
-        }
-      },
-      bytecode: {
-        type: DataTypes.STRING,
-        get() {
-          const rawValue = this.getDataValue("bytecode");
-          return rawValue ? JSON.parse(rawValue) : null;
-        },
-        set(value) {
-          this.setDataValue("bytecode", JSON.stringify(value));
-        }
-      },
-      deployedBytecode: {
-        type: DataTypes.STRING,
-        get() {
-          const rawValue = this.getDataValue("deployedBytecode");
-          return rawValue ? JSON.parse(rawValue) : null;
-        },
-        set(value) {
-          this.setDataValue("deployedBytecode", JSON.stringify(value));
-        }
-      },
+      ast: DataTypes.JSON,
+      legacyAST: DataTypes.JSON,
+      bytecode: DataTypes.JSON,
+      deployedBytecode: DataTypes.JSON,
       immutableReferences: DataTypes.STRING,
       generatedSources: DataTypes.STRING,
       deployedGeneratedSources: DataTypes.STRING,
-      compiler: {
-        type: DataTypes.STRING,
-        get() {
-          const rawValue = this.getDataValue("compiler");
-          return rawValue ? JSON.parse(rawValue) : null;
-        },
-        set(value) {
-          this.setDataValue("compiler", JSON.stringify(value));
-        }
-      }
+      compiler: DataTypes.JSON
     },
     {
       sequelize,
