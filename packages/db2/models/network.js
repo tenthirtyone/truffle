@@ -22,7 +22,8 @@ module.exports = (sequelize, DataTypes) => {
   Network.init(
     {
       chainId: DataTypes.NUMBER,
-      name: DataTypes.STRING
+      name: DataTypes.STRING,
+      historicBlock: DataTypes.NUMBER
     },
     {
       sequelize,

@@ -14,6 +14,9 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
+      historicBlock: {
+        type: Sequelize.NUMBER
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

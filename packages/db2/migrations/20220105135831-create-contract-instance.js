@@ -14,8 +14,11 @@ module.exports = {
       txHash: {
         type: Sequelize.STRING
       },
+      blockHeight: {
+        type: Sequelize.NUMBER
+      },
       links: {
-        type: Sequelize.STRING
+        type: Sequelize.JSON
       },
       networkId: {
         type: Sequelize.NUMBER,

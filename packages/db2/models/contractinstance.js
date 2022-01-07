@@ -17,7 +17,8 @@ module.exports = (sequelize, DataTypes) => {
     {
       address: DataTypes.STRING,
       txHash: DataTypes.STRING,
-      links: DataTypes.STRING
+      blockHeight: DataTypes.NUMBER,
+      links: DataTypes.JSON
     },
     {
       sequelize,
