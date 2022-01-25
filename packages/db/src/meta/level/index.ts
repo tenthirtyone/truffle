@@ -33,15 +33,7 @@ export class LevelDB {
     ];
 
     this.levelDB = this.createDB(database, directory);
-
-    // Partition the db for each collection by collection
-    this.collectionNames.forEach(collectionName => {
-      this.collectionDBs[collectionName] = sublevel(
-        this.levelDB,
-        collectionName,
-        { valueEncoding: "json" }
-      );
-    });
+    this.partitionDBCollections();
   }
 
   createDB(database: string, directory: string) {
@@ -55,6 +47,16 @@ export class LevelDB {
         })
       );
     }
+  }
+
+  partitionDBCollections() {
+    this.collectionNames.forEach(collectionName => {
+      this.collectionDBs[collectionName] = sublevel(
+        this.levelDB,
+        collectionName,
+        { valueEncoding: "json" }
+      );
+    });
   }
 
   async close() {

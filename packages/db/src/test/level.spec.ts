@@ -68,7 +68,7 @@ describe("LevelDB", () => {
         expect(contract).to.eql(op.value);
       });
     });
-    it("batch getsMany 1000 contracts from the db", async () => {
+    it("getsMany 1000 contracts from the db", async () => {
       const collection = "contracts";
       let ops = createBatchOps(collection, 1000);
       await db.batchToCollection(collection, ops);
@@ -83,7 +83,7 @@ describe("LevelDB", () => {
 
       expect(contracts.length).to.equal(ops.length);
     });
-    it("readstreams 1000 objects from a collection", async () => {
+    it("puts 1000 objects and readstreams them out", async () => {
       const collection = "contracts";
       let ops = createBatchOps(collection, 1000);
       await db.batchToCollection(collection, ops);
