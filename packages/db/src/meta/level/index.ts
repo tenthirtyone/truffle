@@ -3,6 +3,11 @@ const sublevel = require("subleveldown");
 
 import { Databases } from "./stores";
 
+// For backwards compatibility
+import * as Id from "@truffle/db/meta/id";
+import { definitions } from "@truffle/db/resources";
+const generateId = Id.forDefinitions(definitions);
+
 type LevelDBConfig = {
   database: string;
   directory: string;
@@ -72,7 +77,15 @@ export class LevelDB {
   }
 
   async get(collectionName: string, key: string) {
-    return await this.collectionDBs[collectionName].get(key);
+    try {
+      return await this.collectionDBs[collectionName].get(key);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async exists(collectionName: string, key: string) {
+    return !!(await this.get(collectionName, key));
   }
 
   async getMany(collectionName: string, keys: string[]) {
@@ -90,7 +103,7 @@ export class LevelDB {
     return await this.collectionDBs[collectionName].batch(ops);
   }
 
-  async createReadStream(collectionName: string) {
+  async all(collectionName: string) {
     const results = [];
     const readStream = this.collectionDBs[collectionName].createReadStream();
 
@@ -100,6 +113,90 @@ export class LevelDB {
     }
 
     return results;
+  }
+
+  // These functions map to the workspace interface
+  /*
+  public async find(collectionName, options) {
+    // allows searching with `id` instead of pouch's internal `_id`,
+    // since we call the field `id` externally, and this approach avoids
+    // an extra index
+    const fixIdSelector = selector =>
+      Object.entries(selector)
+        .map(([field, predicate]) =>
+          field === "id" ? { _id: predicate } : { [field]: predicate }
+        )
+        .reduce((a, b) => ({ ...a, ...b }), {});
+
+    // handle convenient interface for getting a bunch of IDs while preserving
+    // order of input request
+    const savedRecords = Array.isArray(options)
+      ? await this.adapter.retrieve(
+          collectionName,
+          options.map(reference =>
+            reference ? { _id: reference.id } : undefined
+          )
+        )
+      : await this.adapter.search(collectionName, {
+          ...options,
+          selector: fixIdSelector(options.selector)
+        });
+
+    return savedRecords;
+  }
+  */
+
+  // Does not overwrite existing records
+  async add(collectionName, input) {
+    // Add id to each record, filter out existing records
+    const records = input[collectionName]
+      .map(record => {
+        return {
+          id: generateId(collectionName, record),
+          ...record
+        };
+      })
+      .filter(async record => {
+        return await this.exists(collectionName, record.id);
+      });
+
+    for (let i = 0; i < records.length; i++) {
+      const data = records[i];
+      const { id } = data;
+
+      await this.put(collectionName, id, data);
+    }
+
+    return records;
+  }
+
+  // identical to add, but does not filter existing
+  async update(collectionName, input) {
+    const records = input[collectionName].map(record => {
+      return {
+        id: generateId(collectionName, record),
+        ...record
+      };
+    });
+
+    for (let i = 0; i < records.length; i++) {
+      const data = records[i];
+      const { id } = data;
+
+      await this.put(collectionName, id, data);
+    }
+
+    return records;
+  }
+
+  async remove(collectionName, input) {
+    const ids = input[collectionName].map(input => {
+      return generateId(collectionName, input);
+    });
+
+    for (let i = 0; i < ids.length; i++) {
+      await this.del(collectionName, ids[i]);
+    }
   }
 
   static get DEFAULTS(): LevelDBConfig {

@@ -57,6 +57,13 @@ describe("LevelDB", () => {
       let data = await db.get("contracts", "metacoin");
       expect(data).to.eql(testContractData);
     });
+    it("checks if an object exists", async () => {
+      let exists = await db.exists("contracts", "metacoin");
+      expect(exists).to.equal(false);
+
+      await db.put("contracts", "metacoin", testContractData);
+      exists = await db.exists("contracts", "metacoin");
+    });
     it("batch puts 1000 contract direct to the collection", async () => {
       const collection = "contracts";
       let ops = createBatchOps(collection, 1000);
@@ -83,12 +90,12 @@ describe("LevelDB", () => {
 
       expect(contracts.length).to.equal(ops.length);
     });
-    it("puts 1000 objects and readstreams them out", async () => {
+    it("gets all objects from a collection", async () => {
       const collection = "contracts";
       let ops = createBatchOps(collection, 1000);
       await db.batchToCollection(collection, ops);
 
-      const contracts = await db.createReadStream(collection);
+      const contracts = await db.all(collection);
       expect(contracts.length).to.equal(ops.length);
     });
   });
