@@ -33,7 +33,7 @@ export const forAttachAndSchema = <C extends Collections>(options: {
   const connect = (connectOptions?: ConnectOptions<C>): Db<C> => {
     const attachOptions = {
       adapter: (connectOptions || {}).adapter
-    }
+    };
     const workspace = attach(attachOptions);
 
     return {
@@ -68,7 +68,7 @@ export const forAttachAndSchema = <C extends Collections>(options: {
   const serve = (serveOptions?: ConnectOptions<C>) => {
     const attachOptions = {
       adapter: (serveOptions || {}).adapter
-    }
+    };
     const workspace = attach(attachOptions);
 
     return new ApolloServer({
