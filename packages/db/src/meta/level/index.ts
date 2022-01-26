@@ -5,7 +5,7 @@ import { Databases } from "./stores";
 
 // For backwards compatibility
 import * as Id from "@truffle/db/meta/id";
-import { definitions } from "@truffle/db/resources";
+import { definitions } from "@truffle/db/resources"; // @ import make it harder to use the cli
 const generateId = Id.forDefinitions(definitions);
 
 type LevelDBConfig = {
@@ -38,11 +38,13 @@ export class LevelDB {
     ];
 
     this.levelDB = this.createDB(database, directory);
+
     this.partitionDBCollections();
   }
 
   createDB(database: string, directory: string) {
     // LOG - If leveldown adapter passed is invalid, revert to default.
+
     if (Databases[database]) {
       return levelup(Databases[database](directory, { valueEncoding: "json" }));
     } else {
@@ -80,7 +82,7 @@ export class LevelDB {
     try {
       return await this.collectionDBs[collectionName].get(key);
     } catch (e) {
-      return null;
+      return undefined; // Matches pouch
     }
   }
 
@@ -116,6 +118,9 @@ export class LevelDB {
   }
 
   // These functions map to the workspace interface
+  // These can be further optimized. It will refactor when
+  // I get the API.
+
   /*
   public async find(collectionName, options) {
     // allows searching with `id` instead of pouch's internal `_id`,
@@ -167,7 +172,9 @@ export class LevelDB {
       await this.put(collectionName, id, data);
     }
 
-    return records;
+    return {
+      [collectionName]: records
+    };
   }
 
   // identical to add, but does not filter existing
@@ -186,7 +193,9 @@ export class LevelDB {
       await this.put(collectionName, id, data);
     }
 
-    return records;
+    return {
+      [collectionName]: records
+    };
   }
 
   async remove(collectionName, input) {

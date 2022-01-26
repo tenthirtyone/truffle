@@ -1,11 +1,15 @@
 import { LevelDB } from "../meta/level";
 import { expect } from "chai";
 import { testContractData, createBatchOps } from "./helpers";
+import * as Pouch from "../meta/pouch";
+import { definitions } from "@truffle/db/resources";
+import { Migrations as contractArtifact } from "./utils";
 
 const os = require("os");
 
 describe("LevelDB", () => {
   let db: LevelDB;
+
   let testConfig = {
     project: "testproject",
     database: "leveldown",
@@ -97,6 +101,92 @@ describe("LevelDB", () => {
 
       const contracts = await db.all(collection);
       expect(contracts.length).to.equal(ops.length);
+    });
+  });
+  describe("Backwards compatibility", () => {
+    let attach;
+    let levelDB;
+    let pouchDB;
+
+    beforeEach(() => {
+      attach = Pouch.forDefinitions(definitions);
+      pouchDB = attach({
+        adapter: {
+          name: "memory"
+        }
+      });
+
+      levelDB = new LevelDB();
+    });
+
+    it("add", async () => {
+      const resourceName = "contracts";
+      const inputs = {
+        contracts: [contractArtifact]
+      };
+
+      const pouchRecord = await pouchDB.add(resourceName, inputs);
+
+      const levelRecord = await levelDB.add(resourceName, inputs);
+
+      expect(pouchRecord).to.eql(levelRecord);
+    });
+    it("get", async () => {
+      const resourceName = "contracts";
+      const inputs = {
+        contracts: [contractArtifact]
+      };
+
+      let pouchRecord = await pouchDB.add(resourceName, inputs);
+      let levelRecord = await levelDB.add(resourceName, inputs);
+
+      pouchRecord = await pouchDB.get(resourceName, pouchRecord.id);
+      levelRecord = await levelDB.get(resourceName, levelRecord.id);
+
+      expect(pouchRecord).to.eql(levelRecord);
+    });
+    it("delete", async () => {
+      const resourceName = "contracts";
+      const inputs = {
+        contracts: [contractArtifact]
+      };
+
+      let pouchRecord = await pouchDB.add(resourceName, inputs);
+      let levelRecord = await levelDB.add(resourceName, inputs);
+
+      await pouchDB.remove(resourceName, inputs);
+      await levelDB.remove(resourceName, inputs);
+
+      pouchRecord = await pouchDB.get(resourceName, pouchRecord.id);
+      levelRecord = await levelDB.get(resourceName, levelRecord.id);
+
+      expect(pouchRecord).to.eql(levelRecord);
+    });
+
+    it.todo("find");
+    it("update", async () => {
+      const resourceName = "contracts";
+      const oldInputs = {
+        contracts: [{ ...contractArtifact, bytecode: "0x" }]
+      };
+      const inputs = {
+        contracts: [contractArtifact]
+      };
+
+      let pouchRecord = await pouchDB.add(resourceName, oldInputs);
+      let levelRecord = await levelDB.add(resourceName, oldInputs);
+
+      let oldPouchId = pouchRecord.id;
+      let oldLevelId = levelRecord.id;
+
+      expect(pouchRecord).to.eql(levelRecord);
+
+      pouchRecord = await pouchDB.update(resourceName, inputs);
+      levelRecord = await levelDB.update(resourceName, inputs);
+
+      expect(pouchRecord).to.eql(levelRecord);
+      expect(oldPouchId).to.be.equal(pouchRecord.id);
+      expect(oldLevelId).to.be.equal(levelRecord.id);
     });
   });
 });
