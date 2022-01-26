@@ -98,7 +98,7 @@ describe("LevelDB", () => {
 
       expect(contracts.length).to.equal(ops.length);
     });
-    it("gets all objects from a collection (async/await)", async () => {
+    it("gets all objects from a collection", async () => {
       const collection = "contracts";
       let ops = createBatchOps(collection, 1000);
       await db.batchToCollection(collection, ops);
@@ -108,13 +108,11 @@ describe("LevelDB", () => {
     });
   });
   describe("Backwards compatibility", () => {
-    let attach;
     let levelDB;
     let pouchDB;
 
     beforeEach(() => {
-      attach = Pouch.forDefinitions(definitions);
-      pouchDB = attach({
+      pouchDB = Pouch.forDefinitions(definitions)({
         adapter: {
           name: "memory"
         }

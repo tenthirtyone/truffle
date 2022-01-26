@@ -4,6 +4,7 @@ const sublevel = require("subleveldown");
 import { Databases } from "./stores";
 
 // For backwards compatibility
+
 import * as Id from "@truffle/db/meta/id";
 import { definitions } from "@truffle/db/resources"; // @ import make it harder to use the cli
 const generateId = Id.forDefinitions(definitions);
@@ -105,7 +106,7 @@ export class LevelDB {
     return await this.collectionDBs[collectionName].batch(ops);
   }
 
-  async all(collectionName: string) {
+  async all(collectionName: string): Promise<object[]> {
     const results: object[] = [];
 
     return new Promise((resolve, reject) => {
