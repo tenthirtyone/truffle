@@ -1,6 +1,6 @@
 import { LevelDB } from "../meta/level";
 import { expect } from "chai";
-import { testContractData, createBatchOps } from "./helpers";
+import { createBatchOps } from "./helpers";
 import * as Pouch from "../meta/pouch";
 import { definitions } from "@truffle/db/resources";
 import { Migrations as contractArtifact } from "./utils";
@@ -54,18 +54,22 @@ describe("LevelDB", () => {
   });
   describe("DB CRUD operations", () => {
     it("puts an object in the database", async () => {
-      await db.put("contracts", "metacoin", testContractData);
+      await db.put("contracts", "metacoin", contractArtifact);
+    });
+    it("deletes an object in the database", async () => {
+      await db.put("contracts", "metacoin", contractArtifact);
+      await db.del("contracts", "metacoin");
     });
     it("gets an object in the database", async () => {
-      await db.put("contracts", "metacoin", testContractData);
+      await db.put("contracts", "metacoin", contractArtifact);
       let data = await db.get("contracts", "metacoin");
-      expect(data).to.eql(testContractData);
+      expect(data).to.eql(contractArtifact);
     });
     it("checks if an object exists", async () => {
       let exists = await db.exists("contracts", "metacoin");
       expect(exists).to.equal(false);
 
-      await db.put("contracts", "metacoin", testContractData);
+      await db.put("contracts", "metacoin", contractArtifact);
       exists = await db.exists("contracts", "metacoin");
     });
     it("batch puts 1000 contract direct to the collection", async () => {
