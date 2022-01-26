@@ -98,7 +98,7 @@ describe("LevelDB", () => {
 
       expect(contracts.length).to.equal(ops.length);
     });
-    it("gets all objects from a collection", async () => {
+    it("gets all objects from a collection (async/await)", async () => {
       const collection = "contracts";
       let ops = createBatchOps(collection, 1000);
       await db.batchToCollection(collection, ops);

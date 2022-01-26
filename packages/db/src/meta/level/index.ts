@@ -106,15 +106,21 @@ export class LevelDB {
   }
 
   async all(collectionName: string) {
-    const results = [];
-    const readStream = this.collectionDBs[collectionName].createReadStream();
+    const results: object[] = [];
 
-    for await (const data of readStream) {
-      // @ts-ignore
-      results.push(data);
-    }
-
-    return results;
+    return new Promise((resolve, reject) => {
+      this.collectionDBs[collectionName]
+        .createReadStream()
+        .on("data", function (data) {
+          results.push(data);
+        })
+        .on("error", function (err) {
+          reject(err);
+        })
+        .on("end", function () {
+          resolve(results);
+        });
+    });
   }
 
   // These functions map to the workspace interface
