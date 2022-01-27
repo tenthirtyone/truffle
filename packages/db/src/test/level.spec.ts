@@ -133,7 +133,7 @@ describe("LevelDB", () => {
 
       expect(pouchRecord).to.eql(levelRecord);
     });
-    it("get", async () => {
+    it("_get", async () => {
       const resourceName = "contracts";
       const inputs = {
         contracts: [contractArtifact]
@@ -143,7 +143,7 @@ describe("LevelDB", () => {
       let levelRecord = await levelDB.add(resourceName, inputs);
 
       pouchRecord = await pouchDB.get(resourceName, pouchRecord.id);
-      levelRecord = await levelDB.get(resourceName, levelRecord.id);
+      levelRecord = await levelDB._get(resourceName, levelRecord.id);
 
       expect(pouchRecord).to.eql(levelRecord);
     });

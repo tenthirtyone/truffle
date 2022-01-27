@@ -5,6 +5,15 @@ import { Databases } from "./stores";
 
 // For backwards compatibility
 
+import type {
+  CollectionName,
+  Collections,
+  MutationInput,
+  MutationPayload,
+  MutableCollectionName,
+  SavedInput
+} from "@truffle/db/meta/collections";
+import type { Workspace } from "@truffle/db/meta/data";
 import * as Id from "@truffle/db/meta/id";
 import { definitions } from "@truffle/db/resources"; // @ import make it harder to use the cli
 const generateId = Id.forDefinitions(definitions);
@@ -14,7 +23,7 @@ type LevelDBConfig = {
   directory: string;
 };
 
-export class LevelDB {
+export class LevelDB<C extends Collections> implements Workspace<C> {
   config: LevelDBConfig;
   levelDB: typeof levelup;
   collectionDBs: { [name: string]: typeof levelup };
@@ -79,7 +88,7 @@ export class LevelDB {
     return await this.collectionDBs[collectionName].put(key, value);
   }
 
-  async get(collectionName: string, key: string) {
+  async _get(collectionName: string, key: string) {
     try {
       return await this.collectionDBs[collectionName].get(key);
     } catch (e) {
@@ -88,7 +97,7 @@ export class LevelDB {
   }
 
   async exists(collectionName: string, key: string) {
-    return !!(await this.get(collectionName, key));
+    return !!(await this._get(collectionName, key));
   }
 
   async getMany(collectionName: string, keys: string[]) {
@@ -106,8 +115,14 @@ export class LevelDB {
     return await this.collectionDBs[collectionName].batch(ops);
   }
 
-  async all(collectionName: string): Promise<object[]> {
-    const results: object[] = [];
+  // These functions map to the workspace interface
+  // These can be further optimized. It will refactor when
+  // I get the API.
+
+  async all<N extends CollectionName<C>>(
+    collectionName: N
+  ): Promise<SavedInput<C, N>[]> {
+    const results: SavedInput<C, N>[] = [];
 
     return new Promise((resolve, reject) => {
       this.collectionDBs[collectionName]
@@ -124,11 +139,6 @@ export class LevelDB {
     });
   }
 
-  // These functions map to the workspace interface
-  // These can be further optimized. It will refactor when
-  // I get the API.
-
-  /*
   public async find(collectionName, options) {
     // allows searching with `id` instead of pouch's internal `_id`,
     // since we call the field `id` externally, and this approach avoids
@@ -156,10 +166,23 @@ export class LevelDB {
 
     return savedRecords;
   }
-  */
+
+  async get<N extends CollectionName<C>>(
+    collectionName: N,
+    id: string | undefined
+  ): Promise<SavedInput<C, N> | undefined> {
+    try {
+      return await this.collectionDBs[collectionName].get(id);
+    } catch (e) {
+      return undefined; // Matches pouch
+    }
+  }
 
   // Does not overwrite existing records
-  async add(collectionName, input) {
+  async add<N extends CollectionName<C>>(
+    collectionName: N,
+    input: MutationInput<C, N>
+  ): Promise<MutationPayload<C, N>> {
     // Add id to each record, filter out existing records
     const records = input[collectionName]
       .map(record => {
@@ -169,6 +192,7 @@ export class LevelDB {
         };
       })
       .filter(async record => {
+        // @ts-ignore
         return await this.exists(collectionName, record.id);
       });
 
@@ -176,16 +200,20 @@ export class LevelDB {
       const data = records[i];
       const { id } = data;
 
+      // @ts-ignore
       await this.put(collectionName, id, data);
     }
 
     return {
       [collectionName]: records
-    };
+    } as MutationPayload<C, N>;
   }
 
   // identical to add, but does not filter existing
-  async update(collectionName, input) {
+  async update<M extends MutableCollectionName<C>>(
+    collectionName: M,
+    input: MutationInput<C, M>
+  ): Promise<MutationPayload<C, M>> {
     const records = input[collectionName].map(record => {
       return {
         id: generateId(collectionName, record),
@@ -197,20 +225,25 @@ export class LevelDB {
       const data = records[i];
       const { id } = data;
 
+      // @ts-ignore
       await this.put(collectionName, id, data);
     }
 
     return {
       [collectionName]: records
-    };
+    } as MutationPayload<C, M>;
   }
 
-  async remove(collectionName, input) {
+  async remove<M extends MutableCollectionName<C>>(
+    collectionName: M,
+    input: MutationInput<C, M>
+  ): Promise<void> {
     const ids = input[collectionName].map(input => {
       return generateId(collectionName, input);
     });
 
     for (let i = 0; i < ids.length; i++) {
+      // @ts-ignore
       await this.del(collectionName, ids[i]);
     }
   }
